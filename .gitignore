@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 /dist
+.astro/
+
 
 # IDEs and editors
 /.idea
@@ -31,3 +33,8 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
