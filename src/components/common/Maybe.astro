@@ -1,0 +1,12 @@
+---
+export type Props = {condition: () => boolean, children: any}
+const props = Astro.props as Props
+---
+<>
+    {
+        props.condition() ? <slot/> : <></>
+    }
+</>
+
+
+
