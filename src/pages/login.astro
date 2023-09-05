@@ -62,7 +62,7 @@ import Layout from "../components/Layout.astro";
     } else {
       // hide/show email already taken
       const emailError = document.querySelector("#email-taken")!;
-      emailError.style.display = res.errors? ? "inherit" : "none";
+      emailError.style.display = res.errors? "inherit" : "none";
     }
   });
 </script>
