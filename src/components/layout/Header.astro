@@ -3,13 +3,13 @@
 import { JwtManager } from "../../js/utils/jwt-manager";
 import Maybe from "../common/Maybe.astro"
 
-const isLoggedIn = JwtManager.isLoggedIn(Astro)
+const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro)
 ---
 <nav class="navbar navbar-light">
     <div class="container">
         <a class="navbar-brand" href="/">conduit</a>
         <ul class="nav navbar-nav pull-xs-right">
-            <Maybe condition={() => !isLoggedIn}>
+            <Maybe condition={!isLoggedIn}>
                 <li class="nav-item">
                     <!-- Add "active" class when you're on that page" -->
                     <a class="nav-link active" href="/">Home</a>
@@ -21,7 +21,7 @@ const isLoggedIn = JwtManager.isLoggedIn(Astro)
                     <a class="nav-link" href="/register">Sign up</a>
                 </li>
             </Maybe>
-            <Maybe condition={() => isLoggedIn}>
+            <Maybe condition={isLoggedIn}>
                 <li class="nav-item">
                     <!-- Add "active" class when you're on that page" -->
                     <a class="nav-link active" href="/">Home</a>

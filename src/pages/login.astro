@@ -1,0 +1,68 @@
+---
+import Layout from "../components/Layout.astro";
+---
+
+<Layout>
+  <div class="auth-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-6 offset-md-3 col-xs-12">
+          <h1 class="text-xs-center">Sign in</h1>
+          <p class="text-xs-center">
+            <a href="/register">Need an account?</a>
+          </p>
+
+          <ul class="error-messages" id="email-taken" style="display: none;">
+            <li>That email is already taken</li>
+          </ul>
+
+          <form id="login-form">
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="text"
+                placeholder="Email"
+                name="email"
+              />
+            </fieldset>
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="password"
+                placeholder="Password"
+                name="password"
+              />
+            </fieldset>
+            <button class="btn btn-lg btn-primary pull-xs-right">Sign in</button
+            >
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { Api } from "../api/api";
+  import { JwtManager } from "../js/utils/jwt-manager";
+  const selectedForm = document.querySelector("#login-form");
+
+  selectedForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const target = event.target as HTMLFormElement;
+    const data = {
+      email: target?.email.value,
+      password: target?.password?.value,
+    };
+    const res = await Api.loginUser(data);
+
+    if (res.user) {
+      JwtManager.clientSide.save(res.user.token);
+      window.location.replace("/");
+    } else {
+      // hide/show email already taken
+      const emailError = document.querySelector("#email-taken")!;
+      emailError.style.display = res.errors? ? "inherit" : "none";
+    }
+  });
+</script>
