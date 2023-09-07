@@ -1,0 +1,109 @@
+---
+import { Api } from "../api/api";
+import Layout from "../components/Layout.astro";
+import { JwtManager } from "../js/utils/jwt-manager";
+
+const cookie = JwtManager.serverSide.read(Astro);
+if (!cookie) return Astro.redirect("/");
+const { user } = await Api.getLoggedInUser(cookie.value);
+---
+
+<Layout>
+  <div class="settings-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-6 offset-md-3 col-xs-12">
+          <h1 class="text-xs-center">Your Settings</h1>
+
+          <ul class="error-messages">
+            <li>That name is required</li>
+          </ul>
+
+          <form id="settings-form">
+            <fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control"
+                  type="text"
+                  placeholder="URL of profile picture"
+                  name="image"
+                  value={user.image}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Your Name"
+                  name="username"
+                  value={user.username}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <textarea class="form-control form-control-lg" rows="8" name="bio"
+                  >{user.bio}</textarea
+                >
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Email"
+                  name="email"
+                  value={user.email}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="password"
+                  placeholder="New Password"
+                  name="password"
+                />
+              </fieldset>
+              <button class="btn btn-lg btn-primary pull-xs-right"
+                >Update Settings</button
+              >
+            </fieldset>
+          </form>
+          <hr />
+          <button class="btn btn-outline-danger" id="settings-logout"
+            >Or click here to logout.</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { Api } from "../api/api";
+import { JwtManager } from "../js/utils/jwt-manager";
+
+  document
+    .querySelector("#settings-logout")
+    ?.addEventListener("click", async (event) => {
+      JwtManager.clientSide.delete();
+      window.location.replace("/");
+    });
+
+  document
+    .querySelector("#settings-form")
+    ?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const target = event.target as HTMLFormElement;
+      const data = {
+        image: target?.image.value,
+        bio: target?.bio.value,
+        username: target?.username.value,
+        email: target?.email.value,
+        password: target?.password?.value,
+      };
+      const res = await Api.updateUser(JwtManager.clientSide.read(), data);
+
+      if (res.user) {
+        JwtManager.clientSide.save(res.user.token);
+        window.location.href = "/";
+      }
+    });
+</script>

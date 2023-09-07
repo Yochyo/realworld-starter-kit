@@ -26,7 +26,7 @@ export class JwtManagerImpl {
       (document.cookie = document.cookie =
         JwtManagerImpl.KEY + "=" + token + ";"),
     read: () => JwtManager.clientSide.getCookie(JwtManagerImpl.KEY),
-    delete: () => (document.cookie = ""),
+    delete: () => (document.cookie = "token=null;expires=Thu, 01 Jan 1970 00:00:01 GMT"),
   };
   serverSide = {
     isLoggedIn: (ctx: AstroGlobal) => !!JwtManager.serverSide.read(ctx),
