@@ -1,11 +1,21 @@
+---
+export type Props = { isLoggedIn: boolean, tag?: string, isFeed: boolean };
+const props = Astro.props;
+---
+
 <!-- todo tag name feed and your feed -->
 <div class="feed-toggle">
-    <ul class="nav nav-pills outline-active">
-      <li class="nav-item">
-        <a class="nav-link" href="">Your Feed</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link active" href="">Global Feed</a>
-      </li>
-    </ul>
-  </div>
+  <ul class="nav nav-pills outline-active">
+    {props.isLoggedIn && <li class="nav-item">
+      <a class={props.isFeed ? "nav-link active" : "nav-link"} href="/?feed=true">Your Feed</a>
+    </li>}
+    <li class="nav-item">
+      <a class={!props.isFeed && !props.tag ? "nav-link active" : "nav-link"} href="/">Global Feed</a>
+    </li>
+    {
+      props.tag && <li class="nav-item">
+      <a class={props.tag ? "nav-link active" : "nav-link"} href={`/?tag=${props.tag}`}>#{props.tag}</a>
+    </li>
+    }
+  </ul>
+</div>

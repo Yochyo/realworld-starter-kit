@@ -1,24 +1,34 @@
 ---
 import Layout from "../components/Layout.astro";
-import TagContainer from "../components/home/TagContainer.astro"
+import TagContainer from "../components/home/TagContainer.astro";
 import Banner from "../components/home/Banner.astro";
 import Tabbar from "../components/home/Tabbar.astro";
 import ArticlePreview from "../components/home/ArticlePreview.astro";
 import Pagination from "../components/home/Pagination.astro";
+import { Api } from "../api/api";
+import { JwtManager } from "../js/utils/jwt-manager";
 
+const isFeed = Astro.url.searchParams.get("feed") == "true";
+const tag = Astro.url.searchParams.get("tag") ?? undefined;
+const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro);
+const articles = isFeed
+  ? Api.getArticleFeed(JwtManager.serverSide.read(Astro)?.value ?? "", {})
+  : Api.getArticles({ tag });
+const tags = Api.getTags();
 ---
+
 <Layout>
   <div class="home-page">
-    <Banner/>
+    <Banner />
 
     <div class="container page">
       <div class="row">
         <div class="col-md-9">
-          <Tabbar/>
-          <ArticlePreview/>
-          <Pagination/>
+          <Tabbar isLoggedIn={isLoggedIn} isFeed={isFeed} tag={tag} />
+          <ArticlePreview articles={articles} />
+          <Pagination />
         </div>
-        <TagContainer/>
+        <TagContainer tags={tags} />
       </div>
     </div>
   </div>
