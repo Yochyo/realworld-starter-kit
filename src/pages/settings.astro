@@ -3,9 +3,9 @@ import { Api } from "../api/api";
 import Layout from "../components/Layout.astro";
 import { JwtManager } from "../js/utils/jwt-manager";
 
-const cookie = JwtManager.serverSide.read(Astro);
-if (!cookie) return Astro.redirect("/");
-const { user } = await Api.getLoggedInUser(cookie.value);
+const token = JwtManager.serverSide.read(Astro);
+if (!token) return Astro.redirect("/");
+const { user } = await Api.getLoggedInUser(token);
 ---
 
 <Layout>

@@ -13,7 +13,7 @@ const isFeed = params.get("feed") == "true";
 const tag = params.get("tag") ?? undefined;
 const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro);
 const articles = isFeed
-  ? Api.getArticleFeed(JwtManager.serverSide.read(Astro)?.value ?? "", {page})
+  ? Api.getArticleFeed(JwtManager.serverSide.read(Astro) ?? "", {page})
   : Api.getArticles({ tag, page });
 const tags = Api.getTags();
 ---

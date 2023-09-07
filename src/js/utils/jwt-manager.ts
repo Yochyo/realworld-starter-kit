@@ -32,7 +32,7 @@ export class JwtManagerImpl {
     isLoggedIn: (ctx: AstroGlobal) => !!JwtManager.serverSide.read(ctx),
     save: (ctx: AstroGlobal, token: string) =>
       ctx.cookies.set(JwtManagerImpl.KEY, token),
-    read: (ctx: AstroGlobal) => ctx.cookies.get(JwtManagerImpl.KEY),
+    read: (ctx: AstroGlobal) => ctx.cookies.get(JwtManagerImpl.KEY)?.value,
     delete: (ctx: AstroGlobal) => ctx.cookies.delete(JwtManagerImpl.KEY),
   };
 }

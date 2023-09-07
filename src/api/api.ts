@@ -39,6 +39,15 @@ export type TagDTO = {
   tags: string[];
 };
 
+export type ProfileDTO = {
+  profile: {
+    email: "string";
+    username: "string";
+    bio: "string";
+    image: "string";
+  };
+};
+
 export class _Api {
   // private readonly host = 'https://api.realworld.io/api'
   private readonly host = "http://wordpress:3001/api";
@@ -133,6 +142,15 @@ export class _Api {
   async getTags(): Promise<RealworldResult<TagDTO, TagDTO>> {
     return await (
       await fetch(`${this.host}/tags`, {
+        method: "GET",
+        headers: this.defaultHeaders,
+      })
+    ).json();
+  }
+
+  async getProfile(username: string): Promise<RealworldResult<ProfileDTO, ProfileDTO['profile']>> {
+    return await (
+      await fetch(`${this.host}/profiles/${username}`, {
         method: "GET",
         headers: this.defaultHeaders,
       })

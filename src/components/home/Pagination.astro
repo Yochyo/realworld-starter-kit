@@ -11,7 +11,7 @@ const lastPage = Math.max(0, Math.ceil(totalArticles / 20) - 1);
 const pages: number[] =
   lastPage < 9
     ? // show all pages if less than 10
-      Array.from({ length: lastPage }, (_, index) => index)
+      Array.from({ length: Math.max(lastPage, 1) }, (_, index) => index)
     : currentPage + 4 > lastPage
     ? // show last 9 pages if close to last page
       Array.from({ length: 9 }, (_, index) => lastPage - 8 + index)

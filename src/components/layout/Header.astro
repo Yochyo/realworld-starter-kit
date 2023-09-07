@@ -4,6 +4,7 @@ import { JwtManager } from "../../js/utils/jwt-manager";
 import Maybe from "../common/Maybe.astro"
 
 const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro)
+// todo highlight site you're currently on
 ---
 <nav class="navbar navbar-light">
     <div class="container">
@@ -36,6 +37,7 @@ const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro)
                     <a class="nav-link" href="/profile/eric-simons">
                       <img src="" class="user-pic" />
                       Eric Simons
+                      <!-- todo name -->
                     </a>
                   </li>
             </Maybe>
