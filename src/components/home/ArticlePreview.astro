@@ -1,9 +1,11 @@
 ---
 import type { ArticlesDTO } from "../../api/api";
 import Article from "./Article.astro";
+import Pagination from "./Pagination.astro";
 
 export type Props = { articles: Promise<ArticlesDTO> };
 const articles = await Astro.props.articles;
 ---
 
 {articles.articles.map((article) => <Article article={article} />)}
+<Pagination totalArticles={articles.articlesCount}/>

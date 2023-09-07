@@ -4,16 +4,17 @@ import TagContainer from "../components/home/TagContainer.astro";
 import Banner from "../components/home/Banner.astro";
 import Tabbar from "../components/home/Tabbar.astro";
 import ArticlePreview from "../components/home/ArticlePreview.astro";
-import Pagination from "../components/home/Pagination.astro";
 import { Api } from "../api/api";
 import { JwtManager } from "../js/utils/jwt-manager";
 
-const isFeed = Astro.url.searchParams.get("feed") == "true";
-const tag = Astro.url.searchParams.get("tag") ?? undefined;
+const params = Astro.url.searchParams
+const page = +(params.get("page") ?? '0')
+const isFeed = params.get("feed") == "true";
+const tag = params.get("tag") ?? undefined;
 const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro);
 const articles = isFeed
-  ? Api.getArticleFeed(JwtManager.serverSide.read(Astro)?.value ?? "", {})
-  : Api.getArticles({ tag });
+  ? Api.getArticleFeed(JwtManager.serverSide.read(Astro)?.value ?? "", {page})
+  : Api.getArticles({ tag, page });
 const tags = Api.getTags();
 ---
 
@@ -26,7 +27,6 @@ const tags = Api.getTags();
         <div class="col-md-9">
           <Tabbar isLoggedIn={isLoggedIn} isFeed={isFeed} tag={tag} />
           <ArticlePreview articles={articles} />
-          <Pagination />
         </div>
         <TagContainer tags={tags} />
       </div>
