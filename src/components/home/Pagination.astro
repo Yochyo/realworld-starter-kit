@@ -22,24 +22,18 @@ const pages: number[] =
       );
 
 const href = Astro.url.href;
-const createHref = (page: number) => {
-  const url = new URL(href);
-  url.searchParams.set("page", page.toString());
-  return url.toString();
-};
-
 const isFirstPage = currentPage == 0;
 const isLastPage = currentPage == lastPage;
 ---
 
 <ul class="pagination">
   <li class="page-item">
-    <a class="page-link" href={createHref(0)}>{"<<"}</a>
+    <a class="page-link" href={'?page=0'}>{"<<"}</a>
   </li>
   {
     !isFirstPage && (
       <li class="page-item">
-        <a class="page-link" href={createHref(currentPage - 1)}>
+        <a class="page-link" href={`?page=${currentPage - 1}`}>
           {"<"}
         </a>
       </li>
@@ -48,7 +42,7 @@ const isLastPage = currentPage == lastPage;
   {
     pages.map((page) => (
       <li class={page == currentPage ? "page-item active" : "page-item"}>
-        <a class="page-link" href={createHref(page)}>
+        <a class="page-link" href={`?page=${page}`}>
           {page + 1}
         </a>
       </li>
@@ -57,14 +51,14 @@ const isLastPage = currentPage == lastPage;
   {
     !isLastPage && (
       <li class="page-item">
-        <a class="page-link" href={createHref(currentPage + 1)}>
+        <a class="page-link" href={`?page=${currentPage + 1}`}>
           {">"}
         </a>
       </li>
     )
   }
   <li class="page-item">
-    <a class="page-link" href={createHref(lastPage)}>
+    <a class="page-link" href={`?page=${lastPage}`}>
       {">>"}
     </a>
   </li>
