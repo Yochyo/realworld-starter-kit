@@ -1,0 +1,86 @@
+---
+import Layout from "../../components/Layout.astro";
+---
+
+<Layout>
+  <div class="editor-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-10 offset-md-1 col-xs-12">
+          <!-- <ul class="error-messages">
+            <li>That title is required</li>
+          </ul> -->
+
+          <form id="publish-form">
+            <fieldset>
+              <fieldset class="form-group">
+                <input
+                  name="title2"
+                  type="text"
+                  class="form-control form-control-lg"
+                  placeholder="Article Title"
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  name="description"
+                  type="text"
+                  class="form-control"
+                  placeholder="What's this article about?"
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <textarea
+                  name="body"
+                  class="form-control"
+                  rows="8"
+                  placeholder="Write your article (in markdown)"></textarea>
+              </fieldset>
+              <!-- <fieldset class="form-group">
+                todo tags
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter tags"
+                />
+                <div class="tag-list">
+                  <span class="tag-default tag-pill">
+                    <i class="ion-close-round"></i> tag
+                  </span>
+                </div>
+              </fieldset> -->
+              <button
+                class="btn btn-lg pull-xs-right btn-primary"
+              >
+                Publish Article
+              </button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>import { Api } from "../../api/api";
+import { JwtManager } from "../../js/utils/jwt-manager";
+
+  const selectedForm = document.querySelector("#publish-form");
+  console.log(selectedForm);
+  selectedForm?.addEventListener("submit", async (event) => {
+    console.log('click');
+    event.preventDefault();
+    const target = event.target as HTMLFormElement;
+    const data = {
+      title: target?.title2.value,
+      description: target?.description.value,
+      body: target?.body.value,
+      tagList: []
+    };
+    const res = await Api.createArticle(JwtManager.clientSide.read(), data)
+
+    if (res.article) {
+      window.location.replace(`/article/${res.article.slug}`);
+    }
+  });
+</script>

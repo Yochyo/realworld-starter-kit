@@ -1,6 +1,7 @@
 ---
 import { type ProfileDTO } from "../../api/api";
 import Maybe from "../common/Maybe.astro";
+import ProfileFollowButton from "./ProfileFollowButton.astro";
 export type Props = {
   profile: Promise<ProfileDTO>;
   isLoggedInUser: Promise<boolean>;
@@ -22,18 +23,22 @@ console.log(profile);
         </p>
 
         <Maybe condition={!isLoggedInUser}>
-          <button class="btn btn-sm btn-outline-secondary action-btn">
-            <i class="ion-plus-round"></i>
-             &nbsp; Follow {profile?.username ?? ''}
-          </button>
+          <ProfileFollowButton username={profile?.username ?? ''}/>
         </Maybe>
         <Maybe condition={isLoggedInUser}>
-          <button class="btn btn-sm btn-outline-secondary action-btn">
-            <i class="ion-gear-a"></i>
-             &nbsp; Edit Profile Settings
-          </button>
+          <a href="/settings">
+            <button class="btn btn-sm btn-outline-secondary action-btn" >
+              <i class="ion-gear-a"></i>
+               &nbsp; Edit Profile Settings
+            </button>
+          </a>
         </Maybe>
       </div>
     </div>
   </div>
 </div>
+
+
+<script>
+
+</script>

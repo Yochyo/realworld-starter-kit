@@ -1,0 +1,218 @@
+---
+import {
+  Api,
+  type Article,
+  type ArticlesDTO,
+  type Comment,
+} from "../../api/api";
+import Layout from "../../components/Layout.astro";
+import Maybe from "../../components/common/Maybe.astro";
+import { JwtManager } from "../../js/utils/jwt-manager";
+export type Props = { article: Article };
+const { article } = await Api.getArticle(Astro.params.slug ?? "");
+
+// todo werden nicht ausgelagerte komponenten auch verzögert gerendert?
+const isLoggedIn = JwtManager.serverSide.isLoggedIn(Astro);
+const loggedInUser = (
+  await Api.getLoggedInUser(JwtManager.serverSide.read(Astro) ?? "")
+).user;
+const isLoggedInUser = article.author.username == loggedInUser?.username;
+const { comments } = await Api.getComments(article.slug);
+console.log(loggedInUser);
+---
+
+<Layout>
+  <div class="article-page">
+    <div class="banner">
+      <div class="container">
+        <h1>{article.title}</h1>
+
+        <div class="article-meta">
+          <a href="/profile/eric-simons"
+            ><img
+              src={article.author.image ??
+                "https://static.productionready.io/images/smiley-cyrus.jpg"}
+            /></a
+          >
+          <div class="info">
+            <a href="/profile/eric-simons" class="author"
+              >{article.author.username}</a
+            >
+            <span class="date">{article.createdAt}</span>
+          </div>
+          <Maybe condition={!isLoggedInUser}>
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="ion-plus-round"></i>
+               &nbsp; Follow {article.author}
+              <span class="counter">({article.author.following})</span>
+            </button>
+             &nbsp;&nbsp;
+            <button class="btn btn-sm btn-outline-primary">
+              <i class="ion-heart"></i>
+               &nbsp; Favorite Post <span class="counter"
+                >({article.favoritesCount})</span
+              >
+            </button>
+          </Maybe>
+          <Maybe condition={isLoggedInUser}>
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="ion-edit"></i> Edit Article
+            </button>
+            <button class="btn btn-sm btn-outline-danger">
+              <i class="ion-trash-a"></i> Delete Article
+            </button>
+          </Maybe>
+        </div>
+      </div>
+    </div>
+
+    <div class="container page">
+      <div class="row article-content">
+        <div class="col-md-12">
+          {article.body}
+          <ul class="tag-list">
+            {
+              article.tagList.map((tag) => (
+                <li class="tag-default tag-pill tag-outline">{tag}</li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <hr />
+
+      <div class="article-actions">
+        <div class="article-meta">
+          <a href="profile.html"><img src={article.author.image} /></a>
+          <div class="info">
+            <a href="" class="author">{article.author.username}</a>
+            <span class="date">{article.createdAt}</span>
+          </div>
+
+          <Maybe condition={!isLoggedInUser}>
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="ion-plus-round"></i>
+               &nbsp; Follow {article.author.username}
+            </button>
+             &nbsp;
+            <button class="btn btn-sm btn-outline-primary">
+              <i class="ion-heart"></i>
+               &nbsp; Favorite Article <span class="counter"
+                >({article.favoritesCount})</span
+              >
+            </button>
+          </Maybe>
+          <Maybe condition={isLoggedInUser}>
+            <button class="btn btn-sm btn-outline-secondary">
+              <i class="ion-edit"></i> Edit Article
+            </button>
+            <button class="btn btn-sm btn-outline-danger">
+              <i class="ion-trash-a"></i> Delete Article
+            </button>
+          </Maybe>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 col-md-8 offset-md-2">
+          {
+            loggedInUser != undefined && (
+              <form
+                class="card comment-form"
+                id="comment-form"
+                article-slug={article.slug}
+              >
+                <div class="card-block">
+                  <fieldset>
+                    <textarea
+                      class="form-control"
+                      placeholder="Write a comment..."
+                      name="body"
+                      rows="3"
+                    />
+                  </fieldset>
+                </div>
+                <div class="card-footer">
+                  <img
+                    src={
+                      loggedInUser.image ??
+                      "https://static.productionready.io/images/smiley-cyrus.jpg"
+                    }
+                    class="comment-author-img"
+                  />
+                  <button class="btn btn-sm btn-primary">Post Comment</button>
+                </div>
+              </form>
+            )
+          }
+          {
+            comments.map((comment) => (
+              <div class="card">
+                <div class="card-block">
+                  <p class="card-text">{comment.body}</p>
+                </div>
+                <div class="card-footer">
+                  <a href="/profile/author" class="comment-author">
+                    <img
+                      src={comment.author.image}
+                      class="comment-author-img"
+                    />
+                  </a>
+                  &nbsp;
+                  <a href="/profile/jacob-schmidt" class="comment-author">
+                    {comment.author.username}
+                  </a>
+                  <span class="date-posted">{comment.createdAt}</span>
+                  {comment.author.username == loggedInUser.username && (
+                    <span
+                      class="mod-options delete-comment"
+                      comment-id={comment.id}
+                    >
+                      <i class="ion-trash-a" />
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { Api } from "../../api/api";
+  import { JwtManager } from "../../js/utils/jwt-manager";
+
+  const selectedForm = document.querySelector("#comment-form");
+  const slug = selectedForm?.getAttribute("article-slug")!;
+  selectedForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const target = event.target as HTMLFormElement;
+    const res = await Api.createComment(
+      JwtManager.clientSide.read(),
+      slug,
+      target?.body.value,
+    );
+
+    if (res.comment) {
+      window.location.href = window.location.href;
+    }
+  });
+
+  document.querySelectorAll(".delete-comment")?.forEach((element) => {
+    element.addEventListener("click", async () => {
+      const id = element.getAttribute("comment-id")!;
+      const res = await Api.deleteComment(
+        JwtManager.clientSide.read(),
+        slug,
+        +id,
+      );
+      if (!res.errors) {
+        window.location.href = window.location.href;
+      }
+    });
+  });
+</script>

@@ -41,16 +41,27 @@ export type TagDTO = {
 
 export type ProfileDTO = {
   profile: {
-    email: "string";
     username: "string";
     bio: "string";
     image: "string";
+    following: boolean;
   };
 };
 
+export type Comment = {
+  id: number,
+  createdAt: string,
+  updatedAt: string,
+  body: string
+  author: UserDTO['user']
+}
+export type CommentDTO = {
+  comments: Comment[]
+}
+
 export class _Api {
   // private readonly host = 'https://api.realworld.io/api'
-  private readonly host = "http://wordpress:3001/api";
+  private readonly host = "http://localhost:3001/api";
   private readonly defaultHeaders = {
     "content-type": "application/json",
   };
@@ -139,6 +150,41 @@ export class _Api {
     ).json();
   }
 
+  async createArticle(token: string, args: { title: string, description: string, body: string, tagList: string[] }): Promise<RealworldResult<{ article: Article }, Article>> {
+    return await (
+      await fetch(`${this.host}/articles`, {
+        method: "POST",
+        body: JSON.stringify({ article: args }),
+        headers: { ...this.defaultHeaders, Authorization: `Token ${token}` },
+      })
+    ).json();
+  }
+  async deleteArticle(token: string, slug: string): Promise<RealworldResult<{ article: Article }, Article>> {
+    return await (
+      await fetch(`${this.host}/articles`, {
+        method: "POST",
+        headers: { ...this.defaultHeaders, Authorization: `Token ${token}` },
+      })
+    ).json();
+  }
+  async updateArticle(token: string, slug: string, args: { title: string, description: string, body: string, tagList: string[] }): Promise<RealworldResult<{ article: Article }, Article>> {
+    return await (
+      await fetch(`${this.host}/articles/${slug}`, {
+        method: "PUT",
+        body: JSON.stringify({ article: args }),
+        headers: { ...this.defaultHeaders, Authorization: `Token ${token}` },
+      })
+    ).json();
+  }
+  async getArticle(slug: string): Promise<RealworldResult<{ article: Article }, Article>> {
+    return await (
+      await fetch(`${this.host}/articles/${slug}`, {
+        method: "GET",
+        headers: { ...this.defaultHeaders },
+      })
+    ).json();
+  }
+
   async getTags(): Promise<RealworldResult<TagDTO, TagDTO>> {
     return await (
       await fetch(`${this.host}/tags`, {
@@ -155,6 +201,32 @@ export class _Api {
         headers: this.defaultHeaders,
       })
     ).json();
+  }
+  async getComments(slug: string): Promise<RealworldResult<CommentDTO, CommentDTO['comments']>> {
+    return await (
+      await fetch(`${this.host}/articles/${slug}/comments`, {
+        method: "GET",
+        headers: this.defaultHeaders,
+      })
+    ).json();
+  }
+  async createComment(token: string, slug: string, body: string): Promise<RealworldResult<{ comment: Comment }, Comment>> {
+    console.log(token, slug, body);
+
+    return await (
+      await fetch(`${this.host}/articles/${slug}/comments`, {
+        method: "POST",
+        body: JSON.stringify({ comment: { body } }),
+        headers: { ...this.defaultHeaders, Authorization: `Token ${token}` },
+      })
+    ).json();
+  }
+  async deleteComment(token: string, slug: string, id: number): Promise<RealworldResult<{}, CommentDTO['comments']>> {
+    const res = await fetch(`${this.host}/articles/${slug}/comments/${id}`, {
+      method: "DELETE",
+      headers: { ...this.defaultHeaders, Authorization: `Token ${token}` },
+    })
+    return res.status == 200 ? {} : await res.json()
   }
 }
 export const Api = new _Api();

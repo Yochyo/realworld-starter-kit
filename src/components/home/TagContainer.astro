@@ -2,12 +2,12 @@
 import type { TagDTO } from "../../api/api";
 import TagList from "./TagList.astro";
 export type Props = { tags: Promise<TagDTO> };
-const tags = await Astro.props.tags;
+const {tags} = await Astro.props.tags;
 ---
 
 <div class="col-md-3">
   <div class="sidebar">
     <p>Popular Tags</p>
-    <TagList tags={tags}/>
+    {tags && <TagList tags={tags}/>}
   </div>
 </div>

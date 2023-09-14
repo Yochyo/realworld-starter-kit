@@ -7,5 +7,5 @@ export type Props = { articles: Promise<ArticlesDTO> };
 const articles = await Astro.props.articles;
 ---
 
-{articles.articles.map((article) => <Article article={article} />)}
-<Pagination totalArticles={articles.articlesCount}/>
+{articles.articles && articles.articles.map((article) => <Article article={article} />)}
+{articles.articlesCount > 0 && <Pagination totalArticles={articles.articlesCount}/>}

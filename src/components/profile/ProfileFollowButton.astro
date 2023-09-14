@@ -1,0 +1,18 @@
+---
+import type { ProfileDTO } from "../../api/api";
+export type props = {profile: ProfileDTO['profile']}
+const props = Astro.props
+---
+<button id="follow-user-button" class={props.profile?.following ? "btn btn-sm btn-secondary action-btn" : "btn btn-sm btn-outline-secondary action-btn"}>
+    <i class="ion-plus-round"></i>
+     &nbsp; Follow {props.profile?.username ?? ''}
+  </button>
+
+
+
+  <script>
+    const button = document.getElementById('#follow-user-button')
+    button?.addEventListener('click', (event) => {
+        
+    })
+  </script>
