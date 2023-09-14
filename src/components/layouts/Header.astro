@@ -1,0 +1,63 @@
+---
+import { User } from "../../api/models";
+const user: User = undefined;
+const $isLoggedIn = user != undefined;
+const currentPath = Astro.url.pathname;
+---
+
+<nav class="navbar navbar-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">conduit</a>
+    <ul class="nav navbar-nav pull-xs-right">
+      {
+        $isLoggedIn ? (
+          <>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/" ? "active" : ""}`} href="/">
+                Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/login" ? "active" : ""}`} href="/login">
+                Sign in
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/register" ? "active" : ""}`} href="/register">
+                Sign up
+              </a>
+            </li>
+          </>
+        ) : (
+          <>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/" ? "active" : ""}`} href="/">
+                Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/editor" ? "active" : ""}`} href="/editor">
+                {" "}
+                <i class="ion-compose" />
+                &nbsp;New Article{" "}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/settings" ? "active" : ""}`} href="/settings">
+                {" "}
+                <i class="ion-gear-a" />
+                &nbsp;Settings{" "}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/editor" ? "active" : ""}`} href={`/profile/${user.username}`}>
+                <img src="" class="user-pic" />
+                {user.username}
+              </a>
+            </li>
+          </>
+        )
+      }
+    </ul>
+  </div>
+</nav>
