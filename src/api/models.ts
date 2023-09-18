@@ -1,3 +1,7 @@
+export type RealworldResult<T, E = T> = T & {
+  errors: Record<keyof E, [string]>;
+};
+
 export type User = {
   email: string;
   token: string;
@@ -26,6 +30,11 @@ export type Article = {
   author: Profile;
 };
 
+export type Articles = {
+  articles: Article[];
+  articlesCount: number;
+};
+
 export type Comment = {
   id: number;
   createdAt: string;
@@ -33,3 +42,5 @@ export type Comment = {
   body: string;
   author: Profile;
 };
+
+export type Tag = string;
