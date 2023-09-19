@@ -1,0 +1,65 @@
+---
+import { RealworldResult } from "../../api/models";
+import { ApiImpl } from "../../api/api";
+import { CookieHelperImpl } from "../../utils/cookies";
+import Layout from "../../components/layouts/Layout.astro";
+import Error from "../../components/common/Error.astro";
+
+const token = CookieHelperImpl.getToken(Astro.cookies);
+if (!token) return Astro.redirect("/");
+
+let errors: RealworldResult<any>["errors"] | undefined;
+
+if (Astro.request.method == "POST") {
+  const formData = await Astro.request.formData();
+  const title = formData.get("title2") as string;
+  const description = formData.get("description") as string;
+  const body = formData.get("body") as string;
+
+  const res = await ApiImpl.createArticle(token, { title, description, body, tagList: [] });
+  if (res.article) {
+    return Astro.redirect(`/article/${res.article.slug}`);
+  } else errors = res.errors;
+}
+---
+
+<Layout>
+  <div class="editor-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-10 offset-md-1 col-xs-12">
+          {errors && <Error errors={errors} />}
+
+          <form method="post">
+            <fieldset>
+              <fieldset class="form-group">
+                <input name="title2" type="text" class="form-control form-control-lg" placeholder="Article Title" />
+              </fieldset>
+              <fieldset class="form-group">
+                <input name="description" type="text" class="form-control" placeholder="What's this article about?" />
+              </fieldset>
+              <fieldset class="form-group">
+                <textarea name="body" class="form-control" rows="8" placeholder="Write your article (in markdown)"
+                ></textarea>
+              </fieldset>
+              <!-- <fieldset class="form-group">
+                todo tags
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter tags"
+                />
+                <div class="tag-list">
+                  <span class="tag-default tag-pill">
+                    <i class="ion-close-round"></i> tag
+                  </span>
+                </div>
+              </fieldset> -->
+              <button class="btn btn-lg pull-xs-right btn-primary"> Publish Article</button>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

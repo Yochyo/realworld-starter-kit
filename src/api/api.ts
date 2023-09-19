@@ -3,6 +3,7 @@ import { CommentApi } from "./comment-api.ts";
 import { ProfileApi } from "./profile-api.ts";
 import { TagApi } from "./tag-api.ts";
 import { UserApi } from "./user-api.ts";
+import { FavoriteApi } from "./favorite-api.ts";
 
 export function applyMixins(derivedCtor: any, baseCtors: any[]) {
   baseCtors.forEach((baseCtor) => {
@@ -14,14 +15,16 @@ export function applyMixins(derivedCtor: any, baseCtors: any[]) {
 }
 
 class Api {
-  static readonly host = "http://localhost:3001/api";
+  // static readonly host = "http://localhost:3333/api";
+  static readonly host = "https://api.realworld.io/api";
   static readonly defaultHeaders = {
     "content-type": "application/json",
   };
 }
 
-interface Api extends ArticleApi, CommentApi, ProfileApi, TagApi, UserApi {}
+interface Api extends ArticleApi, CommentApi, ProfileApi, TagApi, UserApi, FavoriteApi {}
 
-applyMixins(Api, [ArticleApi, CommentApi, ProfileApi, TagApi, UserApi]);
+applyMixins(Api, [ArticleApi, CommentApi, ProfileApi, TagApi, UserApi, FavoriteApi]);
 
 export default Api;
+export const ApiImpl = new Api();

@@ -1,0 +1,49 @@
+---
+export type Props = { favorited: boolean; favoritesCount: number; slug: string; defaultButtonClasses?: string };
+const { favorited, favoritesCount, slug, additionalButtonClasses = "" } = Astro.props;
+---
+
+<button
+  class={`btn btn-sm ${additionalButtonClasses} ${favorited ? "btn-primary" : "btn-outline-primary"}`}
+  name="article-favorite-button"
+  article-slug={slug}>
+  <slot name="prefix" /><span class="slug-count">{favoritesCount}</span><slot name="suffix" />
+</button>
+
+<script>
+  import { ApiImpl } from "../../api/api";
+  import { getToken } from "../../utils/cookies";
+
+  const buttons = document.getElementsByName("article-favorite-button");
+  buttons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const token = getToken();
+      if (!token) {
+        window.location.href = "/register";
+        return;
+      }
+      const target = event.currentTarget as HTMLElement;
+      target.blur();
+
+      const isFavorite = target.classList.contains("btn-primary");
+      const slug = target.getAttribute("article-slug");
+
+      const count = +target.querySelector(".slug-count").innerHTML;
+      const newCount = isFavorite ? count - 1 : count + 1;
+
+      const res = isFavorite ? ApiImpl.unfavoriteArticle(token, slug) : ApiImpl.favoriteArticle(token, slug);
+      res.then((res) => {
+        if (res.article) {
+          buttons.forEach((buttonToUpdate) => {
+            if (buttonToUpdate.getAttribute("article-slug") == slug) {
+              buttonToUpdate.classList.toggle("btn-outline-primary");
+              buttonToUpdate.classList.toggle("btn-primary");
+
+              buttonToUpdate.querySelector(".slug-count").innerHTML = ` ${newCount}`;
+            }
+          });
+        }
+      });
+    });
+  });
+</script>

@@ -1,0 +1,15 @@
+---
+import { RealworldResult } from "../../api/models";
+export type props = { errors: RealworldResult<any>["errors"] };
+const { errors } = Astro.props;
+---
+
+<ul class="error-messages">
+  {
+    Object.entries(errors).map((error) => (
+      <li>
+        {error[0]}: {error[1]}
+      </li>
+    ))
+  }
+</ul>

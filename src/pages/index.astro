@@ -1,0 +1,72 @@
+---
+import ArticleContainer from "../components/articles/ArticleContainer.astro";
+import { ApiImpl } from "../api/api";
+import { CookieHelperImpl } from "../utils/cookies";
+import { AstroCookies } from "astro";
+import Layout from "../components/layouts/Layout.astro";
+import TagList from "../components/tags/TagList.astro";
+const user = CookieHelperImpl.getUser(Astro.cookies);
+const { tags } = await ApiImpl.getTags();
+
+const isFeed = Astro.url.searchParams.get("feed") == "true";
+const tag = Astro.url.searchParams.get("tag");
+const page = +Astro.url.searchParams.get("page");
+const articles = isFeed
+  ? ApiImpl.getArticleFeed(user.token, { page: page })
+  : tag
+  ? ApiImpl.getArticles({ page: page, tag })
+  : ApiImpl.getArticles({ page: page });
+---
+
+<Layout>
+  <div class="home-page">
+    <div class="banner">
+      <div class="container">
+        <h1 class="logo-font">conduit</h1>
+        <p>A place to share your knowledge.</p>
+      </div>
+    </div>
+
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-9">
+          <div class="feed-toggle">
+            <ul class="nav nav-pills outline-active">
+              {
+                user && (
+                  <li class="nav-item">
+                    <a class={`nav-link ${isFeed ? "active" : ""}`} href="?feed=true">
+                      Your Feed
+                    </a>
+                  </li>
+                )
+              }
+              <li class="nav-item">
+                <a class={`nav-link ${!isFeed && !tag ? "active" : ""}`} href="?">Global Feed</a>
+              </li>
+              {
+                tag && (
+                  <li class="nav-item">
+                    <a class="nav-link active" href={`tag=${tag}`}>
+                      {tag}
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+          </div>
+
+          <ArticleContainer articles={articles} />
+        </div>
+
+        <div class="col-md-3">
+          <div class="sidebar">
+            <p>Popular Tags</p>
+
+            <TagList tags={tags} />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

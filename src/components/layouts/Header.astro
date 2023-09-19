@@ -1,6 +1,7 @@
 ---
 import { User } from "../../api/models";
-const user: User = undefined;
+import { CookieHelperImpl } from "../../utils/cookies";
+const user: User = CookieHelperImpl.getUser(Astro.cookies);
 const $isLoggedIn = user != undefined;
 const currentPath = Astro.url.pathname;
 ---
@@ -11,24 +12,6 @@ const currentPath = Astro.url.pathname;
     <ul class="nav navbar-nav pull-xs-right">
       {
         $isLoggedIn ? (
-          <>
-            <li class="nav-item">
-              <a class={`nav-link ${currentPath == "/" ? "active" : ""}`} href="/">
-                Home
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class={`nav-link ${currentPath == "/login" ? "active" : ""}`} href="/login">
-                Sign in
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class={`nav-link ${currentPath == "/register" ? "active" : ""}`} href="/register">
-                Sign up
-              </a>
-            </li>
-          </>
-        ) : (
           <>
             <li class="nav-item">
               <a class={`nav-link ${currentPath == "/" ? "active" : ""}`} href="/">
@@ -51,8 +34,26 @@ const currentPath = Astro.url.pathname;
             </li>
             <li class="nav-item">
               <a class={`nav-link ${currentPath == "/editor" ? "active" : ""}`} href={`/profile/${user.username}`}>
-                <img src="" class="user-pic" />
+                <img src={user.image} class="user-pic" />
                 {user.username}
+              </a>
+            </li>
+          </>
+        ) : (
+          <>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/" ? "active" : ""}`} href="/">
+                Home
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/login" ? "active" : ""}`} href="/login">
+                Sign in
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class={`nav-link ${currentPath == "/register" ? "active" : ""}`} href="/register">
+                Sign up
               </a>
             </li>
           </>

@@ -1,0 +1,93 @@
+---
+import { RealworldResult } from "../api/models";
+import Layout from "../components/layouts/Layout.astro";
+import { ApiImpl } from "../api/api";
+import { CookieHelperImpl } from "../utils/cookies";
+import Error from "../components/common/Error.astro";
+
+const user = CookieHelperImpl.getUser(Astro.cookies);
+let errors: RealworldResult<any>["errors"] | undefined;
+
+if (Astro.request.method == "POST") {
+  const formData = await Astro.request.formData();
+
+  if (formData.get("logout") == "logout") {
+    CookieHelperImpl.logout(Astro.cookies);
+    return Astro.redirect("/");
+  }
+
+  const image = formData.get("image") as string;
+  const username = formData.get("username") as string;
+  const bio = formData.get("bio") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const res = await ApiImpl.updateUser(user.token, { image, username, bio, email, password });
+  if (res.user) {
+    CookieHelperImpl.setUser(Astro.cookies, res.user);
+    return Astro.redirect("/settings");
+  } else errors = res.errors;
+}
+---
+
+<Layout>
+  <div class="settings-page">
+    <div class="container page">
+      <div class="row">
+        <div class="col-md-6 offset-md-3 col-xs-12">
+          <h1 class="text-xs-center">Your Settings</h1>
+
+          {errors && <Error errors={errors} />}
+
+          <form method="post">
+            <fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control"
+                  type="text"
+                  placeholder="URL of profile picture"
+                  name="image"
+                  value={user.image}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Your Name"
+                  name="username"
+                  value={user.username}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <textarea class="form-control form-control-lg" rows="8" name="bio">{user.bio}</textarea>
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="text"
+                  placeholder="Email"
+                  name="email"
+                  value={user.email}
+                />
+              </fieldset>
+              <fieldset class="form-group">
+                <input
+                  class="form-control form-control-lg"
+                  type="password"
+                  placeholder="New Password"
+                  name="password"
+                />
+              </fieldset>
+              <button class="btn btn-lg btn-primary pull-xs-right">Update Settings</button>
+            </fieldset>
+          </form>
+          <hr />
+          <form method="post">
+            <input type="hidden" name="logout" value="logout" />
+            <button class="btn btn-outline-danger" type="submit">Or click here to logout.</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

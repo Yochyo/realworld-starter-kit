@@ -1,0 +1,27 @@
+---
+import { Article } from "../../api/models";
+import FavoriteButton from "../buttons/FavoriteButton.astro";
+const { article } = Astro.props as { article: Article };
+console.log(article);
+---
+
+<div class="article-preview">
+  <div class="article-meta">
+    <a href={`/profile/${article.author.username}`}><img src={article.author.image} /></a>
+    <div class="info">
+      <a href={`/profile/${article.author.username}`} class="author">{article.author.username}</a>
+      <span class="date">{article.createdAt}</span>
+    </div>
+    <FavoriteButton slug={article.slug} favorited={article.favorited} favoritesCount={article.favoritesCount}>
+      <span slot="prefix"><i class="ion-heart"></i>{" "}</span>
+    </FavoriteButton>
+  </div>
+  <a href={`/article/${article.slug}`} class="preview-link">
+    <h1>{article.title}</h1>
+    <p>{article.description}</p>
+    <span>Read more...</span>
+    <ul class="tag-list">
+      {article.tagList.map((tag) => <li class="tag-default tag-pill tag-outline">{tag}</li>)}
+    </ul>
+  </a>
+</div>

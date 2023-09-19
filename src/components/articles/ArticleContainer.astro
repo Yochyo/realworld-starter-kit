@@ -1,0 +1,10 @@
+---
+import { Article, Articles } from "../../api/models";
+import ArticlePreview from "./ArticlePreview.astro";
+import Panigation from "./Pagination.astro";
+const props = Astro.props as { articles: Promise<Articles> };
+const articles = await props.articles;
+---
+
+{articles.articles.map((article) => <ArticlePreview article={article} />)}
+<Panigation totalArticles={articles.articlesCount} />

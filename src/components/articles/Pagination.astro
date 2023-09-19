@@ -1,0 +1,60 @@
+---
+export type Props = { totalArticles: number };
+
+const { totalArticles } = Astro.props;
+const currentPage = Number(new URL(Astro.url.href).searchParams.get("page") ?? "0");
+
+const lastPage = Math.max(0, Math.ceil(totalArticles / 20) - 1);
+
+const pages: number[] =
+  lastPage < 9
+    ? // show all pages if less than 10
+      Array.from({ length: Math.max(lastPage, 1) }, (_, index) => index)
+    : currentPage + 4 > lastPage
+    ? // show last 9 pages if close to last page
+      Array.from({ length: 9 }, (_, index) => lastPage - 8 + index)
+    : // show first 9 pages or current page and 4 pages before/after
+      Array.from({ length: 9 }, (_, index) => Math.max(0, currentPage - 4) + index);
+
+const href = Astro.url.href;
+const isFirstPage = currentPage == 0;
+const isLastPage = currentPage == lastPage;
+---
+
+<ul class="pagination">
+  <li class="page-item">
+    <a class="page-link" href={"?page=0"}>{"<<"}</a>
+  </li>
+  {
+    !isFirstPage && (
+      <li class="page-item">
+        <a class="page-link" href={`?page=${currentPage - 1}`}>
+          {"<"}
+        </a>
+      </li>
+    )
+  }
+  {
+    pages.map((page) => (
+      <li class={page == currentPage ? "page-item active" : "page-item"}>
+        <a class="page-link" href={`?page=${page}`}>
+          {page + 1}
+        </a>
+      </li>
+    ))
+  }
+  {
+    !isLastPage && (
+      <li class="page-item">
+        <a class="page-link" href={`?page=${currentPage + 1}`}>
+          {">"}
+        </a>
+      </li>
+    )
+  }
+  <li class="page-item">
+    <a class="page-link" href={`?page=${lastPage}`}>
+      {">>"}
+    </a>
+  </li>
+</ul>

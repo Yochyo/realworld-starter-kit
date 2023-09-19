@@ -1,0 +1,37 @@
+---
+import ProfileBanner from "../../components/profile/ProfileBanner.astro";
+import { ApiImpl } from "../../api/api";
+import { CookieHelperImpl } from "../../utils/cookies";
+import Layout from "../../components/layouts/Layout.astro";
+import ArticleContainer from "../../components/articles/ArticleContainer.astro";
+const { username = "" } = Astro.params;
+const profile = ApiImpl.getProfile(username);
+
+const isLoggedInUser = CookieHelperImpl.getUser(Astro.cookies).username == username;
+const isFavorites = Astro.url.searchParams.get("favorite") == "true";
+const articles = isFavorites ? ApiImpl.getArticles({ favorited: username }) : ApiImpl.getArticles({ author: username });
+---
+
+<Layout>
+  <div class="profile-page">
+    <ProfileBanner isLoggedInUser={isLoggedInUser} profile={profile} />
+    <div class="container">
+      <div class="row">
+        <div class="col-xs-12 col-md-10 offset-md-1">
+          <div class="articles-toggle">
+            <ul class="nav nav-pills outline-active">
+              <li class="nav-item">
+                <a class={isFavorites ? "nav-link" : "nav-link active"} href="?favorite=false">My Articles</a>
+              </li>
+              <li class="nav-item">
+                <a class={isFavorites ? "nav-link active" : "nav-link"} href="?favorite=true">Favorited Articles</a>
+              </li>
+            </ul>
+          </div>
+
+          <ArticleContainer articles={articles} />
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

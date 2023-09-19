@@ -1,0 +1,159 @@
+---
+import { Article, User } from "../../api/models";
+import FavoriteButton from "../../components/buttons/FavoriteButton.astro";
+import { ApiImpl } from "../../api/api";
+import { CookieHelperImpl } from "../../utils/cookies";
+import Comment from "../../components/articles/Comment.astro";
+import Layout from "../../components/layouts/Layout.astro";
+import FollowButton from "../../components/buttons/FollowButton.astro";
+const { user } = await ApiImpl.getLoggedInUser(CookieHelperImpl.getToken(Astro.cookies));
+const { article } = await ApiImpl.getArticle(Astro.params.slug);
+const { comments } = await ApiImpl.getComments(article.slug);
+---
+
+<Layout>
+  {
+    article && (
+      <>
+        <div class="article-page">
+          <div class="banner">
+            <div class="container">
+              <h1>{article.title}</h1>
+
+              <div class="article-meta">
+                <a href={`/profile/${article.author.username}`}>
+                  <img src={article.author.image} />
+                </a>
+                <div class="info">
+                  <a href={article.author.image} class="author">
+                    {article.author.username}
+                  </a>
+                  <span class="date">{article.createdAt}</span>
+                </div>
+                {
+
+                }
+
+                &nbsp;&nbsp;
+                {
+                  article.author.username == user.username ?
+                    <>
+                      <a href={`/editor/${article.slug}`}>
+                        <button class="btn btn-sm btn-outline-secondary">
+                          <i class="ion-edit" /> Edit Article
+                        </button>
+                      </a>
+                      <!--todo delete -->
+                      <button class="btn btn-sm btn-outline-danger">
+                        <i class="ion-trash-a" /> Delete Article
+                      </button>
+                    </>
+                    :
+                    <>
+                      <FollowButton following={article.author.following} username={article.author.username} />
+                      <FavoriteButton favorite={article.favorited} favoritesCount={article.favoritesCount}
+                                      slug={article.slug} additionalButtonClasses="pull-xs-right">
+                        <span slot="prefix">Favorite Post (</span>
+                        <span slot="suffix">)</span>
+                      </FavoriteButton>
+                    </>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="container page">
+            <div class="row article-content">
+              <div class="col-md-12">
+                {article.body}
+
+                <ul class="tag-list">
+                  {article.tagList.map(tag =>
+                    <li class="tag-default tag-pill tag-outline">{tag}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="article-actions">
+              <div class="article-meta">
+                <a href={`/profile/${article.author.username}`}>
+                  <img src={article.author.image} />
+                </a>
+                <div class="info">
+                  <a href={`/profile/${article.author.username}`} class="author">
+                    {article.author.username}
+                  </a>
+                  <span class="date">{article.createdAt}</span>
+                </div>
+                {
+                  article.author.username == user.username ? (
+                      <>
+                        <a href={`/editor/${article.slug}`}>
+                          <button class="btn btn-sm btn-outline-secondary">
+                            <i class="ion-edit" /> Edit Article
+                          </button>
+                        </a>
+                        <!--todo-->
+                        <button class="btn btn-sm btn-outline-danger">
+                          <i class="ion-trash-a" /> Delete Article
+                        </button>
+                      </>)
+                    :
+                    (
+                      <>
+                        <button class="btn btn-sm btn-outline-secondary">
+                          <i class="ion-plus-round" />
+                          Follow {article.author.username}
+                        </button>
+                        &nbsp;&nbsp;
+                        <FavoriteButton favorite={article.favorited} favoritesCount={article.favoritesCount}
+                                        slug={article.slug} additionalButtonClasses="pull-xs-right">
+                          <span slot="prefix">Favorite Article (</span>
+                          <span slot="suffix">)</span>
+                        </FavoriteButton>
+                      </>)
+                }
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-12 col-md-8 offset-md-2">
+                {
+                  user ? (
+                      <form class="card comment-form">
+                        <div class="card-block">
+                          <textarea class="form-control" placeholder="Write a comment..." rows="3" />
+                        </div>
+                        <div class="card-footer">
+                          <img src={user.image} class="comment-author-img" />
+                          <button class="btn btn-sm btn-primary">Post Comment</button>
+                        </div>
+                      </form>
+                    )
+                    :
+                    (
+                      <div class="row">
+                        <div class="col-xs-12 col-md-8 offset-md-2">
+                          <p>
+                            <a href="/login">Sign in</a>
+                            &nbsp; or &nbsp;
+                            <a href="/register">Sign up</a>
+                            &nbsp; to add comments on this article.
+                          </p>
+                        </div>
+                      </div>
+                  )
+                  }
+
+                {comments.map(comment =>
+                  <Comment comment={comment} slug={article.slug} loggedInUser={user} />)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+    }
+    </Layout>

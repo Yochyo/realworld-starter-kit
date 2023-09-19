@@ -1,0 +1,44 @@
+---
+import { Comment, User } from "../../api/models";
+const { comment, slug, loggedInUser } = Astro.props as { comment: Comment; slug: string; loggedInUser: User };
+---
+
+<div class="card">
+  <div class="card-block">
+    <p class="card-text">{comment.body}</p>
+  </div>
+  <div class="card-footer">
+    <a href={`/profile/${comment.author.username}`} class="comment-author">
+      <img src={comment.author.image} class="comment-author-img" />
+    </a>
+     &nbsp;
+    <a href={`/profile/${comment.author.username}`} class="comment-author">
+      {comment.author.username}
+    </a>
+    <span class="date-posted">{comment.createdAt}</span>
+    {
+      comment.author.username == loggedInUser.username && (
+        <span class="mod-options">
+          <i class="ion-trash-a" name="delete-comment" comment-id={comment.id} article-slug={slug} />
+        </span>
+      )
+    }
+  </div>
+</div>
+
+<script>
+  import { getToken } from "../../utils/cookies";
+  import { ApiImpl } from "../../api/api";
+
+  const deleteElements = document.getElementsByName("delete-comment");
+  deleteElements.forEach((el) => {
+    el.addEventListener("click", (event) => {
+      const target = event.currentTarget as HTMLElement;
+      const commentId = +target.getAttribute("comment-id");
+      const slug = target.getAttribute("article-slug");
+      const token = getToken();
+
+      ApiImpl.deleteComment(token, slug, commentId).then((_) => (window.location.href = `${window.location.href}`));
+    });
+  });
+</script>

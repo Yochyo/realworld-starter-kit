@@ -2,7 +2,7 @@ import Api from "./api.ts";
 import type { Comment, RealworldResult } from "./models.ts";
 
 export class CommentApi {
-  async getComments(slug: string): Promise<RealworldResult<{ comments: Comment }, Comment>> {
+  async getComments(slug: string): Promise<RealworldResult<{ comments: Comment[] }, Comment>> {
     return await (
       await fetch(`${Api.host}/articles/${slug}/comments`, {
         method: "GET",
