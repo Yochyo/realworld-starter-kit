@@ -11,8 +11,8 @@ const { favorited, favoritesCount, slug, additionalButtonClasses = "" } = Astro.
 </button>
 
 <script>
-  import { ApiImpl } from "../../api/api";
   import { getToken } from "../../utils/cookies";
+  import { favoriteArticle, unfavoriteArticle } from "../../api/api";
 
   const buttons = document.getElementsByName("article-favorite-button");
   buttons.forEach((button) => {
@@ -31,7 +31,7 @@ const { favorited, favoritesCount, slug, additionalButtonClasses = "" } = Astro.
       const count = +target.querySelector(".slug-count").innerHTML;
       const newCount = isFavorite ? count - 1 : count + 1;
 
-      const res = isFavorite ? ApiImpl.unfavoriteArticle(token, slug) : ApiImpl.favoriteArticle(token, slug);
+      const res = isFavorite ? unfavoriteArticle(token, slug) : favoriteArticle(token, slug);
       res.then((res) => {
         if (res.article) {
           buttons.forEach((buttonToUpdate) => {

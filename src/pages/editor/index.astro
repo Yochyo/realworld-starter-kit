@@ -1,9 +1,9 @@
 ---
 import { RealworldResult } from "../../api/models";
-import { ApiImpl } from "../../api/api";
 import { CookieHelperImpl } from "../../utils/cookies";
 import Layout from "../../components/layouts/Layout.astro";
 import Error from "../../components/common/Error.astro";
+import { createArticle } from "../../api/api";
 
 const token = CookieHelperImpl.getToken(Astro.cookies);
 if (!token) return Astro.redirect("/");
@@ -16,7 +16,7 @@ if (Astro.request.method == "POST") {
   const description = formData.get("description") as string;
   const body = formData.get("body") as string;
 
-  const res = await ApiImpl.createArticle(token, { title, description, body, tagList: [] });
+  const res = await createArticle(token, { title, description, body, tagList: [] });
   if (res.article) {
     return Astro.redirect(`/article/${res.article.slug}`);
   } else errors = res.errors;

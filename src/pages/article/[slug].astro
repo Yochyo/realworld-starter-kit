@@ -1,14 +1,14 @@
 ---
 import { Article, User } from "../../api/models";
 import FavoriteButton from "../../components/buttons/FavoriteButton.astro";
-import { ApiImpl } from "../../api/api";
 import { CookieHelperImpl } from "../../utils/cookies";
 import Comment from "../../components/articles/Comment.astro";
 import Layout from "../../components/layouts/Layout.astro";
 import FollowButton from "../../components/buttons/FollowButton.astro";
-const { user } = await ApiImpl.getLoggedInUser(CookieHelperImpl.getToken(Astro.cookies));
-const { article } = await ApiImpl.getArticle(Astro.params.slug);
-const { comments } = await ApiImpl.getComments(article.slug);
+import { getArticle, getComments, getLoggedInUser } from "../../api/api";
+const { user } = await getLoggedInUser(CookieHelperImpl.getToken(Astro.cookies));
+const { article } = await getArticle(Astro.params.slug);
+const { comments } = await getComments(article.slug);
 ---
 
 <Layout>

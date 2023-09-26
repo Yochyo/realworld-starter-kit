@@ -1,15 +1,15 @@
 ---
 import ProfileBanner from "../../components/profile/ProfileBanner.astro";
-import { ApiImpl } from "../../api/api";
 import { CookieHelperImpl } from "../../utils/cookies";
 import Layout from "../../components/layouts/Layout.astro";
 import ArticleContainer from "../../components/articles/ArticleContainer.astro";
+import { getArticles, getProfile } from "../../api/api";
 const { username = "" } = Astro.params;
-const profile = ApiImpl.getProfile(username);
+const profile = getProfile(username);
 
 const isLoggedInUser = CookieHelperImpl.getUser(Astro.cookies).username == username;
 const isFavorites = Astro.url.searchParams.get("favorite") == "true";
-const articles = isFavorites ? ApiImpl.getArticles({ favorited: username }) : ApiImpl.getArticles({ author: username });
+const articles = isFavorites ? getArticles({ favorited: username }) : getArticles({ author: username });
 ---
 
 <Layout>

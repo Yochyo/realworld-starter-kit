@@ -1,9 +1,9 @@
 ---
 import Layout from "../components/layouts/Layout.astro";
-import { ApiImpl } from "../api/api";
 import { RealworldResult } from "../api/models";
 import { CookieHelperImpl } from "../utils/cookies";
 import Error from "../components/common/Error.astro";
+import { registerUser } from "../api/api";
 
 let errors: RealworldResult<any>["errors"] | undefined;
 
@@ -12,8 +12,7 @@ if (Astro.request.method == "POST") {
   const username = formData.get("username") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
-  const res = await ApiImpl.registerUser({ username, email, password });
+  const res = await registerUser({ username, email, password });
   if (res.user) {
     CookieHelperImpl.setUser(Astro.cookies, res.user);
     return Astro.redirect("/");

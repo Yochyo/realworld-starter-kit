@@ -12,8 +12,8 @@ const { following, username } = Astro.props;
 </button>
 
 <script>
-  import { ApiImpl } from "../../api/api";
   import { getToken } from "../../utils/cookies";
+  import { followProfile, unfollowProfile } from "../../api/api";
 
   const buttons = document.getElementsByName("user-follow-button");
   buttons.forEach((button) => {
@@ -29,7 +29,7 @@ const { following, username } = Astro.props;
       const isFollowing = target.classList.contains("btn-secondary");
       const username = target.getAttribute("username");
 
-      const res = isFollowing ? ApiImpl.unfollowProfile(token, username) : ApiImpl.followProfile(token, username);
+      const res = isFollowing ? unfollowProfile(token, username) : followProfile(token, username);
       res.then((res) => {
         if (res.profile) {
           buttons.forEach((buttonToUpdate) => {
