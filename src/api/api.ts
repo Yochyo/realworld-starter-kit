@@ -9,158 +9,81 @@ import {
 } from "./models.ts";
 
 const host = "http://localhost:3333/api";
-const defaultHeaders = {
-  "content-type": "application/json",
-};
 export async function registerUser(args: {
   username: string;
   email: string;
   password: string;
 }): Promise<RealworldResult<{ user: User }, User>> {
-  return await (
-    await fetch(`${host}/users`, {
-      method: "POST",
-      body: JSON.stringify({ user: args }),
-      headers: defaultHeaders,
-    })
-  ).json();
+  return await request("POST", `users`, undefined, { user: args });
 }
 
 export async function loginUser(args: {
   email: string;
   password: string;
 }): Promise<RealworldResult<{ user: User }, User>> {
-  return await (
-    await fetch(`${host}/users/login`, {
-      method: "POST",
-      body: JSON.stringify({ user: args }),
-      headers: defaultHeaders,
-    })
-  ).json();
+  return await request("POST", `users/login`, undefined, { user: args });
 }
 
 export async function getLoggedInUser(token: string): Promise<RealworldResult<{ user: User }, User>> {
-  return await (
-    await fetch(`${host}/user`, {
-      method: "GET",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("GET", `user`, token);
 }
 
 export async function updateUser(
   token: string,
   args: Partial<User & { password: string }>,
 ): Promise<RealworldResult<{ user: User }, User>> {
-  return await (
-    await fetch(`${host}/user`, {
-      method: "PUT",
-      body: JSON.stringify({ user: args }),
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("PUT", `user`, token, { user: args });
 }
 export async function getTags(): Promise<RealworldResult<{ tags: Tag[] }, { tags: Tag[] }>> {
-  return await (
-    await fetch(`${host}/tags`, {
-      method: "GET",
-      headers: defaultHeaders,
-    })
-  ).json();
+  return await request("GET", `tags`);
 }
 export async function getProfile(username: string): Promise<RealworldResult<{ profile: Profile }, Profile>> {
-  return await (
-    await fetch(`${host}/profiles/${username}`, {
-      method: "GET",
-      headers: defaultHeaders,
-    })
-  ).json();
+  return await request("GET", `profiles/${username}`);
 }
 export async function followProfile(
   token: string,
   username: string,
 ): Promise<RealworldResult<{ profile: Profile }, Profile>> {
-  return await (
-    await fetch(`${host}/profiles/${username}/follow`, {
-      method: "POST",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("POST", `profiles/${username}/follow`, token);
 }
 export async function unfollowProfile(
   token: string,
   username: string,
 ): Promise<RealworldResult<{ profile: Profile }, Profile>> {
-  return await (
-    await fetch(`${host}/profiles/${username}/follow`, {
-      method: "DELETE",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("DELETE", `profiles/${username}/follow`, token);
 }
 export async function favoriteArticle(
   token: string,
   slug: string,
 ): Promise<RealworldResult<{ article: Article }, Article>> {
-  return await (
-    await fetch(`${host}/articles/${slug}/favorite`, {
-      method: "POST",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("POST", `articles/${slug}/favorite`, token);
 }
 export async function unfavoriteArticle(
   token: string,
   slug: string,
 ): Promise<RealworldResult<{ article: Article }, Article>> {
-  return await (
-    await fetch(`${host}/articles/${slug}/favorite`, {
-      method: "DELETE",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("DELETE", `articles/${slug}/favorite`, token);
 }
 export async function getComments(slug: string): Promise<RealworldResult<{ comments: Comment[] }, Comment>> {
-  return await (
-    await fetch(`${host}/articles/${slug}/comments`, {
-      method: "GET",
-      headers: defaultHeaders,
-    })
-  ).json();
+  return await request("GET", `articles/${slug}/comments`);
 }
 export async function createComment(
   token: string,
   slug: string,
   body: string,
 ): Promise<RealworldResult<{ comment: Comment }, Comment>> {
-  console.log(token, slug, body);
-
-  return await (
-    await fetch(`${host}/articles/${slug}/comments`, {
-      method: "POST",
-      body: JSON.stringify({ comment: { body } }),
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("POST", `articles/${slug}/comments`, token, { comment: { body } });
 }
 export async function deleteComment(token: string, slug: string, id: number): Promise<RealworldResult<{}, Comment>> {
-  const res = await fetch(`${host}/articles/${slug}/comments/${id}`, {
-    method: "DELETE",
-    headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-  });
-  return res.status == 200 ? {} : await res.json();
+  // return res.status == 200 ? {} : await res.json();
+  return await request("DELETE", `articles/${slug}/comments/${id}`, token);
 }
 export async function getArticleFeed(
   token: string,
   args: { page?: number },
 ): Promise<RealworldResult<Articles, Article>> {
   const { page = 0 } = args;
-  return await (
-    await fetch(`${host}/articles/feed?offset=${page * 20}&limit=20`, {
-      method: "GET",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("GET", `articles/feed?offset=${page * 20}&limit=20`, token);
 }
 export async function getArticles(args: {
   tag?: string;
@@ -176,53 +99,39 @@ export async function getArticles(args: {
   if (args.favorited) params.append("favorited", args.favorited);
   if (args.author) params.append("author", args.author);
 
-  return await (
-    await fetch(`${host}/articles?${params}`, {
-      method: "GET",
-
-      headers: { ...defaultHeaders },
-    })
-  ).json();
+  return await request("GET", `articles?${params}`);
 }
 
 export async function createArticle(
   token: string,
   args: { title: string; description: string; body: string; tagList: string[] },
 ): Promise<RealworldResult<{ article: Article }, Article>> {
-  return await (
-    await fetch(`${host}/articles`, {
-      method: "POST",
-      body: JSON.stringify({ article: args }),
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("POST", `articles`, token);
 }
 export async function deleteArticle(token: string, slug: string): Promise<RealworldResult<{}, Article>> {
-  return await (
-    await fetch(`${host}/articles`, {
-      method: "POST",
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("DELETE", `articles/${slug}`, token);
 }
 export async function updateArticle(
   token: string,
   slug: string,
   args: { title: string; description: string; body: string },
 ): Promise<RealworldResult<{ article: Article }, Article>> {
-  return await (
-    await fetch(`${host}/articles/${slug}`, {
-      method: "PUT",
-      body: JSON.stringify({ article: args }),
-      headers: { ...defaultHeaders, Authorization: `Token ${token}` },
-    })
-  ).json();
+  return await request("PUT", `articles/${slug}`, token, { article: args });
 }
 export async function getArticle(slug: string): Promise<RealworldResult<{ article: Article }, Article>> {
-  return await (
-    await fetch(`${host}/articles/${slug}`, {
-      method: "GET",
-      headers: { ...defaultHeaders },
-    })
-  ).json();
+  return await request("GET", `articles/${slug}`);
+}
+
+async function request<T>(
+  method: RequestInit["method"],
+  route: string,
+  token: string | undefined = undefined,
+  body: object | undefined = undefined,
+): Promise<T> {
+  let init: RequestInit = {
+    method: method,
+    headers: { "content-type": "application/json", Authorization: token ? `Token ${token}` : "" },
+    body: JSON.stringify(body),
+  };
+  return await (await fetch(`${host}/${route}`, init)).json();
 }
